@@ -52,10 +52,7 @@ describe('ChatMessageBubble Component', () => {
 });
 
 describe('ToolApprovalCard Component', () => {
-  it('renders tool name and command preview with action buttons', () => {
-    const onApprove = jest.fn();
-    const onDeny = jest.fn();
-
+  it('renders tool name, command preview and desk approval warning', () => {
     const tool = {
       id: 'tool-1',
       toolName: 'run_command',
@@ -65,30 +62,34 @@ describe('ToolApprovalCard Component', () => {
 
     let tree: any;
     act(() => {
-      tree = renderer.create(
-        <ToolApprovalCard tool={tool} onApprove={onApprove} onDeny={onDeny} />
-      );
+      tree = renderer.create(<ToolApprovalCard tool={tool} />);
     });
 
     const json = JSON.stringify(tree.toJSON());
     expect(json).toContain('run_command');
     expect(json).toContain('npm run test:e2e');
-    expect(json).toContain('Approve');
-    expect(json).toContain('Deny');
+    expect(json).toContain('Requires Desk Approval');
   });
 });
 
 describe('PromptBar Component', () => {
-  it('renders input with placeholder and send button', () => {
-    const onSend = jest.fn();
+  it('renders active monitoring status when connected', () => {
     let tree: any;
     act(() => {
-      tree = renderer.create(<PromptBar onSend={onSend} />);
+      tree = renderer.create(<PromptBar isConnected={true} />);
     });
 
     const json = JSON.stringify(tree.toJSON());
-    expect(json).toContain('Send prompt or feedback...');
-    expect(json).toContain('Send');
+    expect(json).toContain('Monitoring active session');
+  });
+
+  it('renders disconnected prompt when offline', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<PromptBar isConnected={false} />);
+    });
+
+    const json = JSON.stringify(tree.toJSON());
+    expect(json).toContain('Disconnected');
   });
 });
-

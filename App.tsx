@@ -29,9 +29,6 @@ export default function App() {
     messages,
     pendingApproval,
     connect,
-    approveTool,
-    denyTool,
-    sendPrompt,
   } = useAgentSocket({
     url: serverUrl,
     token: sessionToken,
@@ -86,13 +83,9 @@ export default function App() {
         isConnecting={isConnecting}
       />
 
-      {/* Interactive Tool Approval Card */}
+      {/* Read-Only Tool Execution Indicator */}
       {pendingApproval && (
-        <ToolApprovalCard
-          tool={pendingApproval}
-          onApprove={approveTool}
-          onDeny={denyTool}
-        />
+        <ToolApprovalCard tool={pendingApproval} />
       )}
 
       {/* Chat Transcript Feed */}
@@ -116,8 +109,8 @@ export default function App() {
         }
       />
 
-      {/* Prompt Input Bar */}
-      <PromptBar onSend={sendPrompt} disabled={!isConnected} />
+      {/* Read-Only Status Footer */}
+      <PromptBar isConnected={isConnected} />
 
       {/* Connection & Pairing Configuration Modal */}
       <ConnectionModal
@@ -169,20 +162,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   chatList: {
-    paddingVertical: 12,
+    padding: 16,
+    paddingBottom: 24,
     flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
     paddingHorizontal: 32,
-    marginTop: 120,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#cbd5e1',
+    fontWeight: '600',
+    color: '#e2e8f0',
     marginBottom: 8,
   },
   emptySubtitle: {

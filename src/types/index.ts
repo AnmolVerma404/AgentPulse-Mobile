@@ -1,5 +1,5 @@
 /**
- * Core type definitions for AgentPulse Mobile.
+ * Core type definitions for AgentPulse Mobile (Read-Only Monitor).
  */
 
 export type AgentType = 'antigravity' | 'copilot' | 'claude_code' | 'cursor';
@@ -17,7 +17,7 @@ export interface ToolCallRequest {
   toolName: string;
   commandOrArgs: string;
   description?: string;
-  requiresApproval: boolean;
+  requiresApproval?: boolean;
 }
 
 export interface ChatMessage {
@@ -34,6 +34,5 @@ export interface SessionState {
   agentType: AgentType;
   status: AgentExecutionStatus;
   messages: ChatMessage[];
-  pendingApproval?: ToolCallRequest;
+  activeTool?: ToolCallRequest;
 }
-
