@@ -6,21 +6,42 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  StatusBar,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useAgentSocket } from './src/hooks/useAgentSocket';
+import { useAgentKeepAwake } from './src/hooks/useAgentKeepAwake';
+import { useCompletionAlert } from './src/hooks/useCompletionAlert';
 import { AgentStatusBar } from './src/components/AgentStatusBar';
 import { ChatMessageBubble } from './src/components/ChatMessageBubble';
 import { ToolApprovalCard } from './src/components/ToolApprovalCard';
+import { CompletionBanner } from './src/components/CompletionBanner';
 import { PromptBar } from './src/components/PromptBar';
 import { ConnectionModal } from './src/components/ConnectionModal';
+import { loadConnectionSettings, saveConnectionSettings } from './src/services/storage';
 
 export default function App() {
-  const [serverUrl, setServerUrl] = useState('ws://127.0.0.1:49152');
+  const [serverUrl, setServerUrl] = useState('');
   const [sessionToken, setSessionToken] = useState('');
+  const [keepAwakeEnabled, setKeepAwakeEnabled] = useState(true);
+  const [showCompletionBanner, setShowCompletionBanner] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const flatListRef = useRef<FlatList>(null);
+
+  // Load saved pairing credentials on initial mount
+  useEffect(() => {
+    async function initSettings() {
+      const saved = await loadConnectionSettings();
+      if (saved.serverUrl) {
+        setServerUrl(saved.serverUrl);
+      }
+      if (saved.sessionToken) {
+        setSessionToken(saved.sessionToken);
+      }
+      setKeepAwakeEnabled(saved.keepAwakeEnabled);
+    }
+    initSettings();
+  }, []);
 
   const {
     isConnected,
@@ -29,18 +50,26 @@ export default function App() {
     messages,
     pendingApproval,
     connect,
-    approveTool,
-    denyTool,
-    sendPrompt,
   } = useAgentSocket({
     url: serverUrl,
     token: sessionToken,
     autoConnect: false,
   });
 
-  const handleSaveConnection = (newUrl: string, newToken: string) => {
+  // Activate screen keep-awake assertions while agent is actively working
+  useAgentKeepAwake({ status, enabled: keepAwakeEnabled });
+
+  // Trigger haptic and vibration alert when agent completes turn
+  useCompletionAlert({
+    status,
+    onDone: () => setShowCompletionBanner(true),
+  });
+
+  const handleSaveConnection = (newUrl: string, newToken: string, keepAwake: boolean) => {
     setServerUrl(newUrl);
     setSessionToken(newToken);
+    setKeepAwakeEnabled(keepAwake);
+    saveConnectionSettings(newUrl, newToken, keepAwake);
   };
 
   useEffect(() => {
@@ -48,6 +77,12 @@ export default function App() {
       connect();
     }
   }, [serverUrl, sessionToken, connect]);
+
+  useEffect(() => {
+    if (status === 'thinking' || status === 'running_tool') {
+      setShowCompletionBanner(false);
+    }
+  }, [status]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -59,7 +94,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
+      <StatusBar style="light" />
 
       {/* Top Navigation Bar */}
       <View style={styles.header}>
@@ -86,13 +121,15 @@ export default function App() {
         isConnecting={isConnecting}
       />
 
-      {/* Interactive Tool Approval Card */}
+      {/* Task Completion Alert Banner */}
+      <CompletionBanner
+        visible={showCompletionBanner}
+        onDismiss={() => setShowCompletionBanner(false)}
+      />
+
+      {/* Read-Only Tool Execution Indicator */}
       {pendingApproval && (
-        <ToolApprovalCard
-          tool={pendingApproval}
-          onApprove={approveTool}
-          onDeny={denyTool}
-        />
+        <ToolApprovalCard tool={pendingApproval} />
       )}
 
       {/* Chat Transcript Feed */}
@@ -116,14 +153,15 @@ export default function App() {
         }
       />
 
-      {/* Prompt Input Bar */}
-      <PromptBar onSend={sendPrompt} disabled={!isConnected} />
+      {/* Read-Only Status Footer */}
+      <PromptBar isConnected={isConnected} />
 
       {/* Connection & Pairing Configuration Modal */}
       <ConnectionModal
         visible={isModalOpen}
         currentUrl={serverUrl}
         currentToken={sessionToken}
+        keepAwakeEnabled={keepAwakeEnabled}
         onSave={handleSaveConnection}
         onClose={() => setIsModalOpen(false)}
       />
@@ -169,20 +207,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   chatList: {
-    paddingVertical: 12,
+    padding: 16,
+    paddingBottom: 24,
     flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
     paddingHorizontal: 32,
-    marginTop: 120,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#cbd5e1',
+    fontWeight: '600',
+    color: '#e2e8f0',
     marginBottom: 8,
   },
   emptySubtitle: {

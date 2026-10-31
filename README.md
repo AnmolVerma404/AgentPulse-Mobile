@@ -1,6 +1,6 @@
 # AgentPulse Mobile (`agentpulse-mobile`)
 
-> Modern, privacy-first mobile companion for supervising and steering AI coding assistants (**Google Antigravity**, **GitHub Copilot**, **Cursor**) while away from your desk (AFK).
+> Modern, privacy-first mobile companion for supervising AI coding assistants (**Google Antigravity**) while away from your desk (AFK) on your local Wi-Fi network.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Expo](https://img.shields.io/badge/Expo-57-black.svg)](https://expo.dev/)
@@ -11,13 +11,14 @@
 
 ## 📱 Overview
 
-When developers fire off long-running prompts in modern AI coding agents, they frequently step away from their desks. **AgentPulse Mobile** bridges your phone directly to your desktop development session:
+When developers fire off long-running prompts in modern AI coding agents, they frequently step away from their desks. **AgentPulse Mobile** bridges your phone directly to your desktop development session over local Wi-Fi:
 
-* **Live Stream Chat & Reasoning:** Read the agent's real-time thoughts, status changes, and code diff summaries.
-* **Lock-Screen Push Alerts:** Instant high-priority alerts when tasks complete, errors occur, or interactive permissions are required.
-* **One-Tap Approvals:** Approve or deny command executions (`npm test`, `git push`, file edits) right from your phone.
-* **Direct Follow-Up Prompts:** Steer the next iteration via text or native voice dictation.
-* **Zero Cloud Storage:** Standalone client architecture. Sensitive tokens are stored in your device's hardware enclave (iOS Keychain / Android Keystore); no chats or code are ever sent to third-party databases.
+* **Live Stream Chat & Reasoning:** Read the agent's real-time thoughts, stream chunks, and executing tool calls.
+* **Instant Completion Alerts:** Receive haptic pulses, vibration patterns, and a prominent banner when the agent completes its turn (`status: 'done'`), signaling that it is time to return to your desk.
+* **Screen Keep-Awake:** Prevents iOS and Android from sleeping the display and suspending the WebSocket connection while the agent is actively `'thinking'` or `'running_tool'`.
+* **Persistent Hardware Security:** Uses `expo-secure-store` to safely remember your LAN server URL, pairing token, and settings in your device's hardware enclave (iOS Keychain / Android Keystore) so you never need to re-type pairing details on every launch.
+* **Automatic History Hydration:** Pulls recent conversation history on initial handshake (`INIT_SESSION`) so reconnecting never leaves you with an empty screen.
+* **Zero Cloud Storage:** Direct device-to-workstation architecture over LAN. No prompts, code, or tokens are ever uploaded to cloud servers.
 
 ---
 
@@ -26,7 +27,8 @@ When developers fire off long-running prompts in modern AI coding agents, they f
 * **Framework:** React Native 0.86+ with Expo 57+
 * **Language:** TypeScript (Strict Mode)
 * **Storage:** `expo-secure-store` (Hardware Keychain / Keystore)
-* **Networking:** Native WebSockets (Direct LAN / Tunnel)
+* **Display & Alerts:** `expo-keep-awake`, `expo-haptics`
+* **Networking:** Native WebSockets
 * **Testing:** Jest + `@testing-library/react-native` + `jest-expo`
 
 ---
@@ -35,10 +37,14 @@ When developers fire off long-running prompts in modern AI coding agents, they f
 
 ### Prerequisites
 * Node.js 20+ installed
-* Android phone (or emulator) or iPhone with **Expo Go** installed (free on App Store)
+* Workstation and mobile phone connected to the **same local Wi-Fi router**
+* Android phone (or emulator) or iPhone with **Expo Go** installed (free on App Store / Google Play)
 
 ### 1. Installation
 ```bash
+# Navigate to mobile app directory
+cd app
+
 # Install dependencies
 npm install
 ```
@@ -50,19 +56,23 @@ npx expo start
 ```
 
 ### 3. Launching on Devices
-* **Android:** Press <kbd>a</kbd> in terminal or run `npx expo start --android`.
-* **iOS (Development):** Open the **Expo Go** app on your iPhone and scan the terminal QR code, or run via iOS Developer Mode.
-* **Web:** Press <kbd>w</kbd> in terminal or run `npx expo start --web`.
+* **Physical iPhone / Android:** Open camera or the **Expo Go** app and scan the QR code displayed in your terminal.
+* **Android Emulator:** Press <kbd>a</kbd> in terminal or run `npx expo start --android`.
+* **iOS Simulator:** Press <kbd>i</kbd> in terminal or run `npx expo start --ios`.
+* **Web (Testing):** Press <kbd>w</kbd> in terminal.
+
+### 4. Pairing with Desktop
+1. In the mobile app, tap **Pair** (or **Settings**) in the top-right corner.
+2. Enter your workstation's LAN WebSocket URI (e.g., `ws://192.168.1.104:49152`) and the session token shown in your VS Code extension.
+3. Tap **Connect**. The app saves your credentials to hardware secure storage and immediately displays live session status and recent history.
 
 ---
 
 ## 🧪 Testing & Quality Assurance
 
-QA is built into the development cycle from day one:
-
 ```bash
-# Run unit and component test suite
-npm test
+# Run unit and component test suites (22 tests)
+npm test -- --watchAll=false
 
 # Run TypeScript type check
 npx tsc --noEmit
@@ -74,52 +84,23 @@ npx tsc --noEmit
 
 ```
 ./
-├── assets/                  # App icons, splash screens, assets
+├── assets/                  # App icons and splash screens
 ├── src/
-│   ├── components/          # Reusable UI widgets (ChatBubble, ActionButton, StatusBar)
-│   ├── hooks/               # Custom hooks (useAgentSocket, useSession)
-│   ├── screens/             # App screens (ChatScreen, PairingScreen, SettingsScreen)
-│   ├── services/            # SecureStoreService, WebSocketClient
-│   ├── theme/               # Dark mode color palette, typography, spacing
-│   └── types/               # TypeScript models (AgentEvent, SessionState)
-├── __tests__/               # Test suite
-├── App.tsx                  # Root app entrypoint
-├── app.json                 # Expo configuration
+│   ├── components/          # AgentStatusBar, ChatMessageBubble, CompletionBanner, ConnectionModal, PromptBar, ToolApprovalCard
+│   ├── hooks/               # useAgentSocket, useAgentKeepAwake, useCompletionAlert
+│   ├── services/            # storage.ts (expo-secure-store wrapper)
+│   └── types/               # TypeScript models (AgentExecutionStatus, ChatMessage, ToolCallRequest)
+├── __tests__/               # Jest test suites (App, Components, KeepAwake, CompletionAlert, Storage)
+├── App.tsx                  # Root application entrypoint
+├── app.json                 # Expo configuration & plugins
 ├── AGENTS.md                # AI Agent guidelines & context cache
-└── package.json
+└── plan.md                  # Development roadmap and step checklist
 ```
 
 ---
 
 ## 🔒 Security Architecture
 
-1. **Hardware Enclave:** All authentication tokens and pairing keys are encrypted at rest using `expo-secure-store`.
-2. **Zero CORS:** Mobile apps use OS-level sockets (`NSURLSession` / `OkHttp`), eliminating the browser CORS barrier and allowing direct client-to-API communication without an intermediate proxy.
-3. **No Codebase Exposure:** The app only receives chat messages and tool descriptions; full repository source files are never downloaded to the phone.
-
----
-
-## 🗺️ Platform & Distribution Roadmap
-
-* **Android:** Initial open-source release with standalone APKs and Google Play Store distribution.
-* **iOS:** Accessible during development via **Expo Go** and **iOS Developer Mode**; an official Apple App Store release is planned as the project matures.
-* **Web:** Can be exported as a standalone web app via `npx expo export -p web`.
-
----
-
-## 🤝 Contributing
-
-We welcome open-source contributions! Before opening a pull request:
-1. Run `npm test` and ensure all tests pass.
-2. Ensure new features are documented and tested.
-3. Follow the guidelines in [AGENTS.md](AGENTS.md) and [.agents/rules/coding-standards.md](.agents/rules/coding-standards.md).
-
----
-
-## ⚡ TL;DR
-
-* **What it is:** React Native + Expo mobile app to monitor, approve, and steer desktop AI coding agents while AFK.
-* **iOS Support:** Available via Expo Go and iOS Developer Mode for local testing, with an official App Store release planned as the project matures.
-* **Security:** Zero server data storage; tokens stored strictly in hardware Keychain / Keystore.
-* **Run:** `npm install && npx expo start`. Run tests with `npm test`.
-
+1. **Hardware Enclave:** All pairing tokens and host configurations are stored securely with `expo-secure-store`.
+2. **Read-Only Inspection:** The mobile app acts strictly as an observation monitor. It cannot inject arbitrary commands or delete files on your workstation.
+3. **No External Cloud:** All communication is direct peer-to-workstation over your private local area network (LAN).
