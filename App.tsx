@@ -9,6 +9,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { useAgentSocket } from './src/hooks/useAgentSocket';
+import { useAgentKeepAwake } from './src/hooks/useAgentKeepAwake';
 import { AgentStatusBar } from './src/components/AgentStatusBar';
 import { ChatMessageBubble } from './src/components/ChatMessageBubble';
 import { ToolApprovalCard } from './src/components/ToolApprovalCard';
@@ -16,8 +17,9 @@ import { PromptBar } from './src/components/PromptBar';
 import { ConnectionModal } from './src/components/ConnectionModal';
 
 export default function App() {
-  const [serverUrl, setServerUrl] = useState('ws://127.0.0.1:49152');
+  const [serverUrl, setServerUrl] = useState('ws://192.168.0.104:49152');
   const [sessionToken, setSessionToken] = useState('');
+  const [keepAwakeEnabled, setKeepAwakeEnabled] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const flatListRef = useRef<FlatList>(null);
@@ -35,9 +37,13 @@ export default function App() {
     autoConnect: false,
   });
 
-  const handleSaveConnection = (newUrl: string, newToken: string) => {
+  // Activate screen keep-awake assertions while agent is actively working
+  useAgentKeepAwake({ status, enabled: keepAwakeEnabled });
+
+  const handleSaveConnection = (newUrl: string, newToken: string, keepAwake: boolean) => {
     setServerUrl(newUrl);
     setSessionToken(newToken);
+    setKeepAwakeEnabled(keepAwake);
   };
 
   useEffect(() => {
@@ -117,6 +123,7 @@ export default function App() {
         visible={isModalOpen}
         currentUrl={serverUrl}
         currentToken={sessionToken}
+        keepAwakeEnabled={keepAwakeEnabled}
         onSave={handleSaveConnection}
         onClose={() => setIsModalOpen(false)}
       />

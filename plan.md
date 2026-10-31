@@ -21,8 +21,8 @@
 ---
 
 ### Phase 2: Screen Keep-Awake for Mobile OS Sleep
-* [ ] **Step 2.1:** Utilize `expo-keep-awake` in [`App.tsx`](file:///d:/Code/Personal_Projects/AI_Chat_To_App/app/App.tsx): activate keep-awake while the agent status is `'thinking'` or `'running_tool'` so the screen stays active on your counter/desk.
-* [ ] **Step 2.2:** Add a toggle in settings/header allowing the user to turn on/off the keep-awake feature.
+* [x] **Step 2.1:** Utilize `expo-keep-awake` in [`App.tsx`](file:///d:/Code/Personal_Projects/AI_Chat_To_App/app/App.tsx): activate keep-awake while the agent status is `'thinking'` or `'running_tool'` so the screen stays active on your counter/desk.
+* [x] **Step 2.2:** Add a toggle in settings/header allowing the user to turn on/off the keep-awake feature.
 
 ---
 

@@ -7,13 +7,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Switch,
 } from 'react-native';
 
 interface ConnectionModalProps {
   visible: boolean;
   currentUrl: string;
   currentToken: string;
-  onSave: (url: string, token: string) => void;
+  keepAwakeEnabled?: boolean;
+  onSave: (url: string, token: string, keepAwake: boolean) => void;
   onClose: () => void;
 }
 
@@ -21,14 +23,16 @@ export const ConnectionModal: React.FC<ConnectionModalProps> = ({
   visible,
   currentUrl,
   currentToken,
+  keepAwakeEnabled = true,
   onSave,
   onClose,
 }) => {
   const [url, setUrl] = useState(currentUrl);
   const [token, setToken] = useState(currentToken);
+  const [keepAwake, setKeepAwake] = useState(keepAwakeEnabled);
 
   const handleSave = () => {
-    onSave(url.trim(), token.trim());
+    onSave(url.trim(), token.trim(), keepAwake);
     onClose();
   };
 
@@ -45,7 +49,7 @@ export const ConnectionModal: React.FC<ConnectionModalProps> = ({
             <Text style={styles.label}>Server WebSocket URI</Text>
             <TextInput
               style={styles.input}
-              placeholder="e.g. ws://192.168.1.100:49152"
+              placeholder="e.g. ws://192.168.0.104:49152"
               placeholderTextColor="#6b7280"
               value={url}
               onChangeText={setUrl}
@@ -65,6 +69,21 @@ export const ConnectionModal: React.FC<ConnectionModalProps> = ({
               autoCapitalize="none"
               autoCorrect={false}
               secureTextEntry
+            />
+          </View>
+
+          <View style={styles.switchGroup}>
+            <View style={styles.switchTextContainer}>
+              <Text style={styles.switchLabel}>Keep Screen Awake</Text>
+              <Text style={styles.switchDescription}>
+                Prevents display sleep while agent is actively working
+              </Text>
+            </View>
+            <Switch
+              value={keepAwake}
+              onValueChange={setKeepAwake}
+              trackColor={{ false: '#374151', true: '#2563eb' }}
+              thumbColor={keepAwake ? '#60a5fa' : '#9ca3af'}
             />
           </View>
 
@@ -112,42 +131,73 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     marginBottom: 8,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   input: {
     backgroundColor: '#1e293b',
-    color: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#334155',
     borderRadius: 8,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 12,
+    color: '#ffffff',
     fontSize: 15,
+  },
+  switchGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1e293b',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 24,
     borderWidth: 1,
     borderColor: '#334155',
   },
+  switchTextContainer: {
+    flex: 1,
+    marginRight: 12,
+  },
+  switchLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#ffffff',
+    marginBottom: 4,
+  },
+  switchDescription: {
+    fontSize: 12,
+    color: '#94a3b8',
+    lineHeight: 16,
+  },
   buttonRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     gap: 12,
-    marginTop: 16,
+    marginTop: 8,
   },
   cancelBtn: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    flex: 1,
+    paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#334155',
+    backgroundColor: '#1e293b',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#334155',
   },
   cancelText: {
-    color: '#ffffff',
+    color: '#94a3b8',
+    fontSize: 16,
     fontWeight: '600',
   },
   connectBtn: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    flex: 1,
+    paddingVertical: 14,
     borderRadius: 8,
     backgroundColor: '#2563eb',
+    alignItems: 'center',
   },
   connectText: {
     color: '#ffffff',
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
-
