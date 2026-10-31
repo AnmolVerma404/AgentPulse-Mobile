@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -30,6 +30,12 @@ export const ConnectionModal: React.FC<ConnectionModalProps> = ({
   const [url, setUrl] = useState(currentUrl);
   const [token, setToken] = useState(currentToken);
   const [keepAwake, setKeepAwake] = useState(keepAwakeEnabled);
+
+  useEffect(() => {
+    setUrl(currentUrl);
+    setToken(currentToken);
+    setKeepAwake(keepAwakeEnabled);
+  }, [currentUrl, currentToken, keepAwakeEnabled, visible]);
 
   const handleSave = () => {
     onSave(url.trim(), token.trim(), keepAwake);

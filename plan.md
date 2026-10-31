@@ -34,20 +34,20 @@
 ---
 
 ### Phase 4: History Loading & Chat Stream Improvements
-* [ ] **Step 4.1:** In [`src/hooks/useAgentSocket.ts`](file:///d:/Code/Personal_Projects/AI_Chat_To_App/app/src/hooks/useAgentSocket.ts), handle the `INIT_SESSION` event from the extension to load existing conversation messages upon connection.
-* [ ] **Step 4.2:** Correctly render messages by sender:
+* [x] **Step 4.1:** In [`src/hooks/useAgentSocket.ts`](file:///d:/Code/Personal_Projects/AI_Chat_To_App/app/src/hooks/useAgentSocket.ts), handle the `INIT_SESSION` event from the extension to load existing conversation messages upon connection.
+* [x] **Step 4.2:** Correctly render messages by sender:
   - User messages: formatted cleanly on the right with user styling.
   - Agent messages: formatted on the left with markdown and collapsible reasoning.
 
 ---
 
 ### Phase 5: Pairing UI Refinements
-* [ ] **Step 5.1:** Update [`src/components/ConnectionModal.tsx`](file:///d:/Code/Personal_Projects/AI_Chat_To_App/app/src/components/ConnectionModal.tsx) to provide clear guidance for LAN IP input (`ws://192.168.x.x:49152`).
-* [ ] **Step 5.2:** Store paired host and token persistently using `expo-secure-store` so the developer does not need to re-pair every time the app opens.
+* [x] **Step 5.1:** Update [`src/components/ConnectionModal.tsx`](file:///d:/Code/Personal_Projects/AI_Chat_To_App/app/src/components/ConnectionModal.tsx) to provide clear guidance for LAN IP input (`ws://192.168.x.x:49152`).
+* [x] **Step 5.2:** Store paired host and token persistently using `expo-secure-store` so the developer does not need to re-pair every time the app opens.
 
 ---
 
 ### Phase 6: Verification & Tests
-* [ ] **Step 6.1:** Update existing unit tests in `__tests__/` to reflect the read-only UI components.
-* [ ] **Step 6.2:** Verify all tests pass cleanly (`npm test`).
+* [x] **Step 6.1:** Update existing unit tests in `__tests__/` to reflect the read-only UI components.
+* [x] **Step 6.2:** Verify all tests pass cleanly (`npm test`).
 

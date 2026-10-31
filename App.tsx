@@ -17,15 +17,31 @@ import { ToolApprovalCard } from './src/components/ToolApprovalCard';
 import { CompletionBanner } from './src/components/CompletionBanner';
 import { PromptBar } from './src/components/PromptBar';
 import { ConnectionModal } from './src/components/ConnectionModal';
+import { loadConnectionSettings, saveConnectionSettings } from './src/services/storage';
 
 export default function App() {
-  const [serverUrl, setServerUrl] = useState('ws://192.168.0.104:49152');
+  const [serverUrl, setServerUrl] = useState('');
   const [sessionToken, setSessionToken] = useState('');
   const [keepAwakeEnabled, setKeepAwakeEnabled] = useState(true);
   const [showCompletionBanner, setShowCompletionBanner] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const flatListRef = useRef<FlatList>(null);
+
+  // Load saved pairing credentials on initial mount
+  useEffect(() => {
+    async function initSettings() {
+      const saved = await loadConnectionSettings();
+      if (saved.serverUrl) {
+        setServerUrl(saved.serverUrl);
+      }
+      if (saved.sessionToken) {
+        setSessionToken(saved.sessionToken);
+      }
+      setKeepAwakeEnabled(saved.keepAwakeEnabled);
+    }
+    initSettings();
+  }, []);
 
   const {
     isConnected,
@@ -53,6 +69,7 @@ export default function App() {
     setServerUrl(newUrl);
     setSessionToken(newToken);
     setKeepAwakeEnabled(keepAwake);
+    saveConnectionSettings(newUrl, newToken, keepAwake);
   };
 
   useEffect(() => {
