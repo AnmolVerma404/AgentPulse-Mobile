@@ -6,8 +6,8 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  StatusBar,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useAgentSocket } from './src/hooks/useAgentSocket';
 import { useAgentKeepAwake } from './src/hooks/useAgentKeepAwake';
 import { useCompletionAlert } from './src/hooks/useCompletionAlert';
@@ -94,7 +94,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
+      <StatusBar style="light" />
 
       {/* Top Navigation Bar */}
       <View style={styles.header}>

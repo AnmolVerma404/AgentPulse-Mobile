@@ -20,7 +20,7 @@ describe('useAgentKeepAwake hook', () => {
 
   beforeEach(() => {
     activateSpy = jest.spyOn(KeepAwake, 'activateKeepAwakeAsync').mockImplementation(() => Promise.resolve());
-    deactivateSpy = jest.spyOn(KeepAwake, 'deactivateKeepAwake').mockImplementation(() => Promise.resolve(true));
+    deactivateSpy = jest.spyOn(KeepAwake, 'deactivateKeepAwake').mockImplementation(() => Promise.resolve());
   });
 
   afterEach(() => {
