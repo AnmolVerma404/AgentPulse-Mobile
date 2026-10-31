@@ -53,7 +53,11 @@ export function useAgentSocket({
     setIsConnecting(true);
 
     try {
-      const fullUrl = token ? `${url}?token=${encodeURIComponent(token)}` : url;
+      const fullUrl = url.includes('?token=')
+        ? url
+        : token
+        ? `${url}?token=${encodeURIComponent(token)}`
+        : url;
       const ws = new WebSocket(fullUrl);
       socketRef.current = ws;
 

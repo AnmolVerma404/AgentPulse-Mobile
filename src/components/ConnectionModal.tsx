@@ -37,8 +37,33 @@ export const ConnectionModal: React.FC<ConnectionModalProps> = ({
     setKeepAwake(keepAwakeEnabled);
   }, [currentUrl, currentToken, keepAwakeEnabled, visible]);
 
+  const handleUrlChange = (text: string) => {
+    const trimmed = text.trim();
+    if (trimmed.includes('?token=')) {
+      const [baseUrl, queryToken] = trimmed.split('?token=');
+      setUrl(baseUrl);
+      if (queryToken) {
+        setToken(queryToken);
+      }
+    } else {
+      setUrl(text);
+    }
+  };
+
   const handleSave = () => {
-    onSave(url.trim(), token.trim(), keepAwake);
+    let cleanUrl = url.trim();
+    let cleanToken = token.trim();
+
+    // Auto-extract token if user pasted the entire URI with ?token= into the URL field
+    if (cleanUrl.includes('?token=')) {
+      const [baseUrl, queryToken] = cleanUrl.split('?token=');
+      cleanUrl = baseUrl;
+      if (!cleanToken && queryToken) {
+        cleanToken = queryToken;
+      }
+    }
+
+    onSave(cleanUrl, cleanToken, keepAwake);
     onClose();
   };
 
@@ -55,10 +80,10 @@ export const ConnectionModal: React.FC<ConnectionModalProps> = ({
             <Text style={styles.label}>Server WebSocket URI</Text>
             <TextInput
               style={styles.input}
-              placeholder="e.g. ws://192.168.0.104:49152"
+              placeholder="e.g. ws://192.168.0.104:49152 (or paste full URL)"
               placeholderTextColor="#6b7280"
               value={url}
-              onChangeText={setUrl}
+              onChangeText={handleUrlChange}
               autoCapitalize="none"
               autoCorrect={false}
             />
