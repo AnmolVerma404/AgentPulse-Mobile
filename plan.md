@@ -27,9 +27,9 @@
 ---
 
 ### Phase 3: Completion Alerts (Audio & Haptics)
-* [ ] **Step 3.1:** Trigger haptic feedback (via `expo-haptics`) when agent transitions to `'done'`.
-* [ ] **Step 3.2:** Play an audible notification chime when task completion arrives.
-* [ ] **Step 3.3:** Display a prominent "Task Completed — Ready for Next Step" banner in the UI.
+* [x] **Step 3.1:** Trigger haptic feedback (via `expo-haptics`) when agent transitions to `'done'`.
+* [x] **Step 3.2:** Play an audible notification chime / vibration when task completion arrives.
+* [x] **Step 3.3:** Display a prominent "Task Completed — Ready for Next Step" banner in the UI.
 
 ---
 

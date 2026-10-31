@@ -10,9 +10,11 @@ import {
 } from 'react-native';
 import { useAgentSocket } from './src/hooks/useAgentSocket';
 import { useAgentKeepAwake } from './src/hooks/useAgentKeepAwake';
+import { useCompletionAlert } from './src/hooks/useCompletionAlert';
 import { AgentStatusBar } from './src/components/AgentStatusBar';
 import { ChatMessageBubble } from './src/components/ChatMessageBubble';
 import { ToolApprovalCard } from './src/components/ToolApprovalCard';
+import { CompletionBanner } from './src/components/CompletionBanner';
 import { PromptBar } from './src/components/PromptBar';
 import { ConnectionModal } from './src/components/ConnectionModal';
 
@@ -20,6 +22,7 @@ export default function App() {
   const [serverUrl, setServerUrl] = useState('ws://192.168.0.104:49152');
   const [sessionToken, setSessionToken] = useState('');
   const [keepAwakeEnabled, setKeepAwakeEnabled] = useState(true);
+  const [showCompletionBanner, setShowCompletionBanner] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const flatListRef = useRef<FlatList>(null);
@@ -40,6 +43,12 @@ export default function App() {
   // Activate screen keep-awake assertions while agent is actively working
   useAgentKeepAwake({ status, enabled: keepAwakeEnabled });
 
+  // Trigger haptic and vibration alert when agent completes turn
+  useCompletionAlert({
+    status,
+    onDone: () => setShowCompletionBanner(true),
+  });
+
   const handleSaveConnection = (newUrl: string, newToken: string, keepAwake: boolean) => {
     setServerUrl(newUrl);
     setSessionToken(newToken);
@@ -51,6 +60,12 @@ export default function App() {
       connect();
     }
   }, [serverUrl, sessionToken, connect]);
+
+  useEffect(() => {
+    if (status === 'thinking' || status === 'running_tool') {
+      setShowCompletionBanner(false);
+    }
+  }, [status]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -87,6 +102,12 @@ export default function App() {
         status={status}
         isConnected={isConnected}
         isConnecting={isConnecting}
+      />
+
+      {/* Task Completion Alert Banner */}
+      <CompletionBanner
+        visible={showCompletionBanner}
+        onDismiss={() => setShowCompletionBanner(false)}
       />
 
       {/* Read-Only Tool Execution Indicator */}

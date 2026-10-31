@@ -2,6 +2,7 @@ import renderer, { act } from 'react-test-renderer';
 import { AgentStatusBar } from '../src/components/AgentStatusBar';
 import { ChatMessageBubble } from '../src/components/ChatMessageBubble';
 import { ToolApprovalCard } from '../src/components/ToolApprovalCard';
+import { CompletionBanner } from '../src/components/CompletionBanner';
 import { PromptBar } from '../src/components/PromptBar';
 
 describe('AgentStatusBar Component', () => {
@@ -69,6 +70,34 @@ describe('ToolApprovalCard Component', () => {
     expect(json).toContain('run_command');
     expect(json).toContain('npm run test:e2e');
     expect(json).toContain('Requires Desk Approval');
+  });
+});
+
+describe('CompletionBanner Component', () => {
+  it('renders task completed message when visible', () => {
+    const onDismiss = jest.fn();
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <CompletionBanner visible={true} onDismiss={onDismiss} />
+      );
+    });
+
+    const json = JSON.stringify(tree.toJSON());
+    expect(json).toContain('Task Completed');
+    expect(json).toContain('Return to your workstation');
+  });
+
+  it('renders null when visible is false', () => {
+    const onDismiss = jest.fn();
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <CompletionBanner visible={false} onDismiss={onDismiss} />
+      );
+    });
+
+    expect(tree.toJSON()).toBeNull();
   });
 });
 
