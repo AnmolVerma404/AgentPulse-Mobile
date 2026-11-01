@@ -32,7 +32,10 @@ When developers fire off long-running prompts in modern AI coding agents, they f
 
 ## 📸 Demo
 
-https://github.com/user-attachments/assets/ae510464-4f61-4539-949b-d59d985af573
+
+<p align="center">
+  <video src="https://github.com/user-attachments/assets/ae510464-4f61-4539-949b-d59d985af573" width="600" controls></video>
+</p>
 
 ---
 
