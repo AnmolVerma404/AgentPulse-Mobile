@@ -34,7 +34,7 @@ When developers fire off long-running prompts in modern AI coding agents, they f
 
 > Watch AgentPulse in action: live thought streaming, display keep-awake, and instant task completion alerts over home Wi-Fi.
 
-<video src="https://github.com/AnmolVerma404/AgentPulse-Mobile/raw/main/assets/AgentPulse.mov" controls="controls" width="100%"></video>
+📹 **Video Walkthrough:** [Watch `AgentPulse.mov`](./assets/AgentPulse.mov)
 
 ---
 
@@ -175,3 +175,10 @@ npx tsc --noEmit
 1. **Hardware Enclave:** All pairing tokens and host configurations are stored securely with `expo-secure-store`.
 2. **Read-Only Inspection:** The mobile app acts strictly as an observation monitor. It cannot inject arbitrary commands or delete files on your workstation.
 3. **No External Cloud:** All communication is direct peer-to-workstation over your private local area network (LAN).
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
