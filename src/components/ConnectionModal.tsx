@@ -19,6 +19,42 @@ interface ConnectionModalProps {
   onClose: () => void;
 }
 
+/**
+ * Parses a combined connection URI (e.g. ws://192.168.0.104:49152?token=abcdef)
+ * into its base WebSocket URL and session token components.
+ */
+export function parseConnectionUri(rawUri: string): { url: string; token: string } {
+  const trimmed = rawUri.trim();
+  if (!trimmed) {
+    return { url: '', token: '' };
+  }
+
+  if (trimmed.includes('?token=')) {
+    const [baseUrl, queryToken] = trimmed.split('?token=');
+    return {
+      url: baseUrl.trim(),
+      token: (queryToken || '').trim(),
+    };
+  }
+
+  return {
+    url: trimmed,
+    token: '',
+  };
+}
+
+/**
+ * Combines URL and token into a single connection URI string.
+ */
+export function formatConnectionUri(url: string, token: string): string {
+  const cleanUrl = url.trim();
+  const cleanToken = token.trim();
+  if (!cleanUrl) return '';
+  if (cleanUrl.includes('?token=')) return cleanUrl;
+  if (!cleanToken) return cleanUrl;
+  return `${cleanUrl}?token=${cleanToken}`;
+}
+
 export const ConnectionModal: React.FC<ConnectionModalProps> = ({
   visible,
   currentUrl,
@@ -27,43 +63,19 @@ export const ConnectionModal: React.FC<ConnectionModalProps> = ({
   onSave,
   onClose,
 }) => {
-  const [url, setUrl] = useState(currentUrl);
-  const [token, setToken] = useState(currentToken);
+  const [connectionUri, setConnectionUri] = useState(
+    formatConnectionUri(currentUrl, currentToken)
+  );
   const [keepAwake, setKeepAwake] = useState(keepAwakeEnabled);
 
   useEffect(() => {
-    setUrl(currentUrl);
-    setToken(currentToken);
+    setConnectionUri(formatConnectionUri(currentUrl, currentToken));
     setKeepAwake(keepAwakeEnabled);
   }, [currentUrl, currentToken, keepAwakeEnabled, visible]);
 
-  const handleUrlChange = (text: string) => {
-    const trimmed = text.trim();
-    if (trimmed.includes('?token=')) {
-      const [baseUrl, queryToken] = trimmed.split('?token=');
-      setUrl(baseUrl);
-      if (queryToken) {
-        setToken(queryToken);
-      }
-    } else {
-      setUrl(text);
-    }
-  };
-
   const handleSave = () => {
-    let cleanUrl = url.trim();
-    let cleanToken = token.trim();
-
-    // Auto-extract token if user pasted the entire URI with ?token= into the URL field
-    if (cleanUrl.includes('?token=')) {
-      const [baseUrl, queryToken] = cleanUrl.split('?token=');
-      cleanUrl = baseUrl;
-      if (!cleanToken && queryToken) {
-        cleanToken = queryToken;
-      }
-    }
-
-    onSave(cleanUrl, cleanToken, keepAwake);
+    const { url, token } = parseConnectionUri(connectionUri);
+    onSave(url, token, keepAwake);
     onClose();
   };
 
@@ -73,34 +85,25 @@ export const ConnectionModal: React.FC<ConnectionModalProps> = ({
         <View style={styles.content}>
           <Text style={styles.title}>Pair with Desktop</Text>
           <Text style={styles.subtitle}>
-            Enter the AgentPulse connection URI or host details from your VS Code extension.
+            Paste the single connection URI copied from your desktop extension.
           </Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Server WebSocket URI</Text>
+            <Text style={styles.label}>Connection URI</Text>
             <TextInput
               style={styles.input}
-              placeholder="e.g. ws://192.168.0.104:49152 (or paste full URL)"
+              placeholder="ws://192.168.x.x:49152?token=..."
               placeholderTextColor="#6b7280"
-              value={url}
-              onChangeText={handleUrlChange}
+              value={connectionUri}
+              onChangeText={setConnectionUri}
               autoCapitalize="none"
               autoCorrect={false}
+              autoFocus={true}
+              selectTextOnFocus={true}
             />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Session Token</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Paste 256-bit ephemeral token"
-              placeholderTextColor="#6b7280"
-              value={token}
-              onChangeText={setToken}
-              autoCapitalize="none"
-              autoCorrect={false}
-              secureTextEntry
-            />
+            <Text style={styles.helperText}>
+              Includes both workstation IP and ephemeral pairing token in one string.
+            </Text>
           </View>
 
           <View style={styles.switchGroup}>
@@ -154,7 +157,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   label: {
     fontSize: 13,
@@ -170,9 +173,16 @@ const styles = StyleSheet.create({
     borderColor: '#334155',
     borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     color: '#ffffff',
-    fontSize: 15,
+    fontSize: 14,
+    fontFamily: 'monospace',
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#94a3b8',
+    marginTop: 8,
+    lineHeight: 16,
   },
   switchGroup: {
     flexDirection: 'row',
