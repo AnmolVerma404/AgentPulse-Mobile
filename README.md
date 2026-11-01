@@ -34,9 +34,7 @@ When developers fire off long-running prompts in modern AI coding agents, they f
 
 > Watch AgentPulse in action: live thought streaming, display keep-awake, and instant task completion alerts over home Wi-Fi.
 
-<video src="./assets/AgentPulse.mov" controls="controls" width="100%"></video>
-
-*(Direct video link: [assets/AgentPulse.mov](./assets/AgentPulse.mov))*
+<video src="https://github.com/AnmolVerma404/AgentPulse-Mobile/raw/main/assets/AgentPulse.mov" controls="controls" width="100%"></video>
 
 ---
 
