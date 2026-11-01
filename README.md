@@ -30,12 +30,19 @@ When developers fire off long-running prompts in modern AI coding agents, they f
 
 ---
 
-## 📸 Demo
+## 📸 Demo & Screenshots
 
+### 1. One-Click Pairing
+Copy the pairing URI from the desktop extension and paste it into the mobile companion:
 
-<p align="center">
-  <video src="https://github.com/user-attachments/assets/ae510464-4f61-4539-949b-d59d985af573" width="600" controls></video>
-</p>
+![Paste URI into mobile app](./assets/demo-paste-uri.png)
+
+### 2. Live Thought Stream & Completion Alert
+Monitor agent thoughts and tool calls in real time, with instant completion notifications when the turn finishes:
+
+![Task completed notification](./assets/demo-task-complete.png)
+
+📹 **Full Video Walkthrough:** [Download or Watch `AgentPulse.mov`](./assets/AgentPulse.mov)
 
 ---
 
@@ -180,4 +187,3 @@ npx tsc --noEmit
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
-
