@@ -30,11 +30,9 @@ When developers fire off long-running prompts in modern AI coding agents, they f
 
 ---
 
-## 🎬 Demo & Video Walkthrough
+## 📸 Demo
 
-> Watch AgentPulse in action: live thought streaming, display keep-awake, and instant task completion alerts over home Wi-Fi.
-
-📹 **Video Walkthrough:** [Watch `AgentPulse.mov`](./assets/AgentPulse.mov)
+- 
 
 ---
 
