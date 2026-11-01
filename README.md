@@ -30,11 +30,19 @@ When developers fire off long-running prompts in modern AI coding agents, they f
 
 ---
 
-## 🎬 Demo & Video Walkthrough
+## 📸 Demo & Screenshots
 
-> Watch AgentPulse in action: live thought streaming, display keep-awake, and instant task completion alerts over home Wi-Fi.
+### 1. One-Click Pairing
+Copy the pairing URI from the desktop extension and paste it into the mobile companion:
 
-📹 **Video Walkthrough:** [Watch `AgentPulse.mov`](./assets/AgentPulse.mov)
+![Paste URI into mobile app](./assets/demo-paste-uri.png)
+
+### 2. Live Thought Stream & Completion Alert
+Monitor agent thoughts and tool calls in real time, with instant completion notifications when the turn finishes:
+
+![Task completed notification](./assets/demo-task-complete.png)
+
+📹 **Full Video Walkthrough:** [Download or Watch `AgentPulse.mov`](./assets/AgentPulse.mov)
 
 ---
 
@@ -179,4 +187,3 @@ npx tsc --noEmit
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
-
